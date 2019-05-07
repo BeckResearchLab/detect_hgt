@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+
+import os
+import urllib.request
+
+if not os.path.exists('gi_taxid_nucl.dmp.gz'):
+	print("file 'gi_taxid_nucl.dmp.gz' doesn't exist, downloading...")
+	urllib.request.urlretrieve(
+                'ftp://ftp.ncbi.nih.gov/pub/taxonomy/gi_taxid_nucl.dmp.gz',
+                'gi_taxid_nucl.dmp.gz')
+else:
+	print("file 'gi_taxid_nucl.dmp.gz' exists, skipping download...")
