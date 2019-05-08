@@ -21,7 +21,7 @@ for root, dirs, files in os.walk(homedir):
 
 current_file = 0
 f = open("refseq_taxonomy.tsv", "w")
-f.write("locus\tkingdom\tphylum\tclass\torder\tfamily\tgenus\n")
+f.write("gff_file\tkingdom\tphylum\tclass\torder\tfamily\tgenus\n")
 for root, dirs, files in os.walk(homedir):
     for file in files:
         filepath = os.path.join(root, file)
@@ -32,7 +32,8 @@ for root, dirs, files in os.walk(homedir):
             try:
                 for seq_record in SeqIO.parse(filepath, "genbank"):
                     taxonomy = seq_record.annotations["taxonomy"]
-                    f.write(f"{seq_record.id}\t{taxonomy[0] if len(taxonomy) > 0 else np.nan}\t{taxonomy[1] if len(taxonomy) > 1 else np.nan}\t{taxonomy[2] if len(taxonomy) > 2 else np.nan}\t{taxonomy[3] if len(taxonomy) > 3 else np.nan}\t{taxonomy[4] if len(taxonomy) > 4 else np.nan}\t{taxonomy[5] if len(taxonomy) > 5 else np.nan}\n")
+                    f.write(f"{filepath}\t{taxonomy[0] if len(taxonomy) > 0 else np.nan}\t{taxonomy[1] if len(taxonomy) > 1 else np.nan}\t{taxonomy[2] if len(taxonomy) > 2 else np.nan}\t{taxonomy[3] if len(taxonomy) > 3 else np.nan}\t{taxonomy[4] if len(taxonomy) > 4 else np.nan}\t{taxonomy[5] if len(taxonomy) > 5 else np.nan}\n")
+                    break
             except AttributeError:
                 print(f"parsing of file {filepath} failed")
 

@@ -6,7 +6,8 @@ import sys
 import pandas as pd
 
 
-parser = argparse.ArgumentParser(description='refseq taxonomy partition')
+parser = argparse.ArgumentParser(description='refseq taxonomy partition',
+            usage='e.g., ./refseq_taxonomy_partition.py family Enterobacteriaceae')
 parser.add_argument('taxlevel', 
         choices=['kingdom', 'phylum', 'class', 'order', 'family', 'genus'],
         help='what taxonomy level should the data be partitioned on')
