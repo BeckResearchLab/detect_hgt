@@ -8,7 +8,7 @@ import pandas as pd
 import scipy.io
 
 parser = argparse.ArgumentParser(description='balance sample refseq cds for both classes',
-            usage='e.g., ./refseq_cds_balance.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_matched.tsv refseq_cds_not_matched.tsv')
+            usage='e.g., ./refseq_cds_balance.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_matched_filtered.tsv refseq_cds_not_matched_filtered.tsv')
 parser.add_argument('taxlevel', 
         choices=['kingdom', 'phylum', 'class', 'order', 'family', 'genus'],
         help='what taxonomy level should be used as the class')
@@ -32,11 +32,11 @@ for filename in filenames:
 
 print(f"finding positive examples")
 positives = df.loc[df[taxlevel] == taxa]
-print(f"{positives.size[0]} samples")
+print(f"{positives.shape[0]} samples")
 print(f"finding negative examples")
 negatives = df.loc[df[taxlevel] != taxa]
-print(f"{negatives.size[0]} samples with be randomly sampled down")
-negsamples = negatives.sample(n=positives.size[0], random_state=42)
+print(f"{negatives.shape[0]} samples with be randomly sampled down")
+negsamples = negatives.sample(n=positives.shape[0], random_state=42)
 print(f"concatenating positive and negative samples")
 df = positives.append(negsamples)
 print(f"shuffling the order of samples")
