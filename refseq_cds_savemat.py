@@ -18,14 +18,22 @@ parser.add_argument('infile',
         help='the balanced refseq cds tsv file to be converted to .mat')
 parser.add_argument('outfile',
         help='the balanced refseq cds .mat outputfile')
+parser.add_argument('--trim', dest='trim_length', default=None,
+        help='trim sequences to a given length')
 args = parser.parse_args()
 taxlevel = args.taxlevel
 taxa = args.taxa
 infile = args.infile
 outfile = args.outfile
+trim_length = args.trim_length
 
 print(f"reading tsv data file {infile}")
 df = pd.read_csv(infile, sep='\t').filter(items=['sequence', taxlevel])
+
+if trim_length is not None:
+    raise Exception("unimplemented feature (--trim)")
+else:
+    pass
 
 outfile = 'refseq_cds.mat'
 print(f"saving mat data to file {outfile}")
