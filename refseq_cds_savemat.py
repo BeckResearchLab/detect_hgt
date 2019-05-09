@@ -17,7 +17,7 @@ parser.add_argument('taxa',
 parser.add_argument('infile',
         help='the balanced refseq cds tsv file to be converted to .mat')
 parser.add_argument('outfile',
-        help='the balanced refseq cds .mat outfile file')
+        help='the balanced refseq cds .mat outputfile')
 args = parser.parse_args()
 taxlevel = args.taxlevel
 taxa = args.taxa
