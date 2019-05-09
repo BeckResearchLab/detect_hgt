@@ -12,7 +12,7 @@ import pandas as pd
 
 def gff_cds_extract(filepath):
     output = io.StringIO()
-    output.write("gff_file\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tlocus\tproduct_id\tsequence\n")
+    output.write("gff_file\tid\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tlocus\tproduct_id\tsequence\n")
 
     try:
         for seq_record in SeqIO.parse(filepath, "genbank"):
