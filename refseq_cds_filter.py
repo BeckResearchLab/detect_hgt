@@ -22,6 +22,6 @@ outfile = args.outfile
 print(f"reading tsv data file {infile}")
 df = pd.read_csv(infile, sep='\t')
 print(f"filtering {df.shape[0]} samples for minimum sequence length of {length}")
-df = df.loc[df.sequence.str.len() < length]
+df = df.loc[df.sequence.str.len() >= length]
 print(f"saving {df.shape[0]} filtered samples to {outfile}")
 df.to_csv(outfile, sep='\t', index=False)
