@@ -4,17 +4,9 @@ REFSEQ_PATH=/work/data/refseq
 THREADS=24
 MIN_SEQ_LEN=750
 
-if [ ! -e refseq_taxonomy.tsv ]; then
-	./refseq_taxonomy_extractor.py --refseq_path $REFSEQ_PATH \
-			--output_file refseq_taxonomy.tsv --threads $THREADS
-fi
-
-if [ ! -e refseq_taxonomy_matched.tsv -o ! -e refseq_taxonomy_not_matched.tsv ]; then
-	./refseq_taxonomy_partition.py family Enterobacteriaceae
-fi
-
-if [ ! -e refseq_cds_matched.tsv -o ! -e refseq_cds_not_matched.tsv ]; then
-	./refseq_cds_extractor.py --threads $THREADS
+if [ ! -e refseq_cds.tsv -o ]; then
+	./refseq_cds_extractor.py --refseq_path $REFSEQ_PATH \
+			--output_file refseq_cds.tsv --threads $THREADS
 fi
 
 if [ ! -e refseq_cds_matched_filtered.tsv ]; then
