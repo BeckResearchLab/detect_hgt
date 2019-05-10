@@ -3,6 +3,7 @@
 REFSEQ_PATH=/work/data/refseq
 THREADS=24
 MIN_SEQ_LEN=750
+CLASS_SAMPLES=100000
 
 if [ ! -e refseq_cds.tsv ]; then
 	./refseq_cds_extractor.py --refseq_path $REFSEQ_PATH \
@@ -13,10 +14,11 @@ if [ ! -e refseq_cds_filtered.tsv ]; then
 	./refseq_cds_filter.py --input_file refseq_cds.tsv --output_file refseq_cds_filtered.tsv \
 			--min_seq_length $MIN_SEQ_LEN --trim_seq_length $MIN_SEQ_LEN
 
-if [ ! -e refseq_cds_filtered_balanced.tsv ]; then
+ef [ ! -e refseq_cds_filtered_balanced.tsv ]; then
 	./refseq_cds_balance.py --tax_level family --taxa Enterobacteriaceae \
 			--output_file refseq_cds_filtered_balanced.tsv \
-			--input_file refseq_cds_filtered.tsv --random_seed 42
+			--input_file refseq_cds_filtered.tsv \
+			--positive_samples $CLASS_SAMPLES --random_seed 42
 fi
 
 if [ ! -e refseq_cds_train.mat -o ! -e refseq_cds_valid.mat -o ! -e refseq_cds_test.mat ]; then

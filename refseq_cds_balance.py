@@ -19,7 +19,10 @@ import pandas as pd
 @click.option('-r', '--random_seed', 'random_seed', type=int, default=42,
         show_default=True,
         help='random seed to be used for shuffling and sampling data partitions')
-def refseq_cds_balance(tax_level, taxa, input_file, output_file, random_seed):
+@click.option('-s', '--positive_samples', 'positive_samples', type=int,
+        default=0, show_default=True,
+        help='limit the number of positive samples to this number (disabled = 0)')
+def refseq_cds_balance(tax_level, taxa, input_file, output_file, random_seed, positive_samples):
     """Balance samples of sequences for a binary classification at a given taxonomy level and class"""
 
     print(f'reading cds tsv data file {input_file}')
@@ -29,6 +32,9 @@ def refseq_cds_balance(tax_level, taxa, input_file, output_file, random_seed):
     print(f'finding sequences at the {tax_level} matching {taxa}')
     positives = df.loc[df[tax_level] == taxa]
     print(f'found {positives.shape[0]} samples')
+    if positive_samples > 0:
+        print(f'down sampling positive samples to {positive_samples} while shuffling')
+        positives = positives.sample(n=positive_samples, random_state=random_seed)
     print(f'finding sequences not matching {tax_level} if {taxa}')
     negatives = df.loc[df[tax_level] != taxa]
     print(f'found {negatives.shape[0]} samples to be randomly sampled down to {positives.shape[0]} samples')
