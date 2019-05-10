@@ -1,52 +1,95 @@
 #!/usr/bin/env python
 
-import argparse
+from datetime import datetime
 import io
 import os
+import shutil
 
 from Bio import SeqIO
-from multiprocessing import Pool
+import click
+import multiprocessing
 import numpy as np
 import pandas as pd
 
 
+def process_pool_init(lock, outfile, include_all):
+    global output_file_lock
+    output_file_lock = lock
+    global output_f
+    output_f = outfile
+    global include_all_loci
+    include_all_loci = include_all
+
 def gff_cds_extract(filepath):
     output = io.StringIO()
-    output.write("gff_file\tid\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tlocus\tproduct_id\tsequence\n")
-
     try:
-        for seq_record in SeqIO.parse(filepath, "genbank"):
-            taxonomy = seq_record.annotations["taxonomy"]
+        for seq_record in SeqIO.parse(filepath, 'genbank'):
+            taxonomy = seq_record.annotations['taxonomy']
+            if not include_all_loci and \
+                    ('plasmid' in seq_record.description or
+                        'extrachromosomal' in seq_record.description):
+                continue
             for feature in seq_record.features:
                 if feature.type == 'CDS':
                     output.write(f"{filepath}\t{seq_record.id}\t{taxonomy[0] if len(taxonomy) > 0 else np.nan}\t{taxonomy[1] if len(taxonomy) > 1 else np.nan}\t{taxonomy[2] if len(taxonomy) > 2 else np.nan}\t{taxonomy[3] if len(taxonomy) > 3 else np.nan}\t{taxonomy[4] if len(taxonomy) > 4 else np.nan}\t{taxonomy[5] if len(taxonomy) > 5 else np.nan}\t{feature.qualifiers['protein_id'][0] if 'protein_id' in feature.qualifiers else np.nan}\t{feature.location.extract(seq_record).seq}\n")
     except AttributeError:
-        print(f"parsing of file {filepath} failed")
+        print(f'parsing of file {filepath} failed')
 
     output.seek(0)
-    df = pd.read_csv(output, sep='\t')
-    return df
+    output_file_lock.acquire()
+    shutil.copyfileobj(output, output_f)
+    output_f.flush()
+    output_file_lock.release()
 
 
-parser = argparse.ArgumentParser(description='refseq parallel cds extractor',
-        usage='e.g., ./refseq_cds_extractor.py --threads 24')
-parser.add_argument('--threads', dest='threads', type=int, default=8,
-                help='number of parallel threads to use to proecss input files')
-args = parser.parse_args()
-threads = args.threads
+@click.command()
+@click.option('-t', '--threads', 'threads', default=16, type=int,
+        help='number of parallel Genbank parser threads')
+@click.option('-r', '--refseq_path', 'refseq_path', type=str, required=True,
+        help='path to the root of the refseq download')
+@click.option('-o', '--output_file', 'output_file', type=str, required=True,
+        help='name of the output file w/ taxonomy annotations and sequences')
+@click.option('-g', '--genbank_postfix', 'genbank_postfix', type=str,
+        default='.gbff', show_default=True,
+        help='postfix for Genbank files')
+@click.option('-i', '--include_all', 'include_all', type=bool,
+        default=False, show_default=True,
+        help='should plasmids and extrachromosomal elements be included')
+def refseq_cds_extractor(threads, refseq_path, output_file, genbank_postfix, include_all):
+    """Extract the taxonomy and CDS sequences from a collection of GBFF files"""
 
-datafiles = ['refseq_taxonomy_matched.tsv', 'refseq_taxonomy_not_matched.tsv']
-for datafile in datafiles:
-    df = pd.read_csv(datafile, sep='\t')
+    start_time = datetime.now()
 
-    print(f"discovering sequences from {datafile} with {threads} parallel threads")
+    print(f'finding Genbank files in {refseq_path}')
+    gbff_files = []
+    for root, dirs, files in os.walk(refseq_path):
+        for file_ in files:
+            filepath = os.path.join(root, file_)
+            if filepath.endswith(genbank_postfix):
+                gbff_files.append(filepath)
 
-    outfile = datafile.replace('taxonomy', 'cds')
-    with Pool(threads) as p:
-        dfs = p.map(gff_cds_extract, list(df['gff_file']))
+    print(f'scanning {len(gbff_files)} files to extract taxonomy and CDS sequences')
+    print(f'using {threads} parallel parsers')
 
-    df = dfs.pop(0)
-    for df_i in dfs:
-        df = df.append(df_i)
-    df.to_csv(outfile, sep='\t', index=False)
-    print(f"extracted {df.shape[0]} cds sequences from metadata in {datafile} into {outfile}")
+    f = open(output_file, 'w')
+    f.write('gff_file\tid\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tproduct_id\tsequence\n')
+    f.flush()
+
+    lock = multiprocessing.Lock()
+    process_pool = multiprocessing.Pool(threads,
+            initializer=process_pool_init, initargs=(lock, f, include_all, ))
+    process_pool.map(gff_cds_extract, gbff_files)
+    process_pool.close()
+    process_pool.join()
+
+    f.close()
+
+    print(f'extracted {sequences} cds sequences from into {output_file}')
+
+    stop_time = datetime.now()
+    total_time = stop_time - start_time
+    print(f'run time was: {total_time}')
+
+
+if __name__ == '__main__':
+    refseq_cds_extractor()
