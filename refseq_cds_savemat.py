@@ -31,16 +31,17 @@ trim_length = args.trim_length
 print(f"reading tsv data file {infile}")
 df = pd.read_csv(infile, sep='\t').filter(items=['sequence', taxlevel])
 
-if trim_length is not None:
-    raise Exception("unimplemented feature (--trim)")
-else:
-    pass
-
 print(f"encoding {df.shape[0]} sequences")
 bases_arr = np.array(['A', 'C', 'G', 'T'])
 bases_encoding = { 'A': 0, 'C': 1, 'G': 2, 'T': 3 }
-df["sequence"] = df['sequence'].apply(lambda x:
+if trim_length is None:
+    df["sequence"] = df['sequence'].apply(lambda x:
         selene_sdk.sequences.sequence_to_encoding(x, bases_encoding, bases_arr))
+else:
+    trim_length = int(trim_length)
+    print(f"trimming sequences during encoding to max length of {trim_length}")
+    df["sequence"] = df['sequence'].apply(lambda x:
+            selene_sdk.sequences.sequence_to_encoding(x[:trim_length], bases_encoding, bases_arr))
 
 outfile = 'refseq_cds.mat'
 print(f"saving mat data to file {outfile}")
