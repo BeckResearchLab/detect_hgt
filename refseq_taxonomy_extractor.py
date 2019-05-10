@@ -1,29 +1,31 @@
 #!/usr/bin/env python
 
 import os
-import io
 from datetime import datetime
 
 from Bio import SeqIO
 import click
-from multiprocessing import Pool
+import multiprocessing
 import numpy as np
-import pandas as pd
 
+
+def process_pool_init(lock, outfile):
+    global output_file_lock
+    output_file_lock = lock
+    global output_f
+    output_f = outfile
 
 def gff_taxonomy_extract(filepath):
-    output = io.StringIO()
-    output.write('gff_file\tkingdom\tphylum\tclass\torder\tfamily\tgenus\n')
     try:
         for seq_record in SeqIO.parse(filepath, 'genbank'):
             taxonomy = seq_record.annotations['taxonomy']
-            output.write(f'{filepath}\t{taxonomy[0] if len(taxonomy) > 0 else np.nan}\t{taxonomy[1] if len(taxonomy) > 1 else np.nan}\t{taxonomy[2] if len(taxonomy) > 2 else np.nan}\t{taxonomy[3] if len(taxonomy) > 3 else np.nan}\t{taxonomy[4] if len(taxonomy) > 4 else np.nan}\t{taxonomy[5] if len(taxonomy) > 5 else np.nan}\n')
+            output_file_lock.acquire()
+            output_f.write(f'{filepath}\t{taxonomy[0] if len(taxonomy) > 0 else np.nan}\t{taxonomy[1] if len(taxonomy) > 1 else np.nan}\t{taxonomy[2] if len(taxonomy) > 2 else np.nan}\t{taxonomy[3] if len(taxonomy) > 3 else np.nan}\t{taxonomy[4] if len(taxonomy) > 4 else np.nan}\t{taxonomy[5] if len(taxonomy) > 5 else np.nan}\n')
+            output_f.flush()
+            output_file_lock.release()
             break
     except AttributeError:
         print(f'parsing of file {filepath} failed')
-    output.seek(0)
-    df = pd.read_csv(output, sep='\t')
-    return df
     
 
 @click.command()
@@ -44,14 +46,20 @@ def refseq_taxonomy_extractor(threads, refseq_path, output_file):
             filepath = os.path.join(root, file_)
             if filepath.endswith('.gbff'):
                 gbff_files.append(filepath)
+    print(f'scanning {len(gbff_files)} files')
 
-    with Pool(threads) as p:
-        dfs = p.map(gff_taxonomy_extract, gbff_files)
+    f = open(output_file, 'w')
+    f.write('gff_file\tkingdom\tphylum\tclass\torder\tfamily\tgenus\n')
+    f.flush()
 
-    df = dfs.pop(0)
-    df.to_csv(outfile, sep='\t', index=False)
-    for df_i in dfs:
-        df_i.to_csv(outfile, sep='\t', index=False, header=False, mode='a')
+    lock = multiprocessing.Lock()
+    process_pool = multiprocessing.Pool(threads,
+            initializer=process_pool_init, initargs=(lock, f, ))
+    process_pool.map(gff_taxonomy_extract, gbff_files)
+    process_pool.close()
+    process_pool.join()
+
+    f.close()
 
     stop_time = datetime.now()
     total_time = stop_time - start_time
