@@ -84,8 +84,6 @@ def refseq_cds_extractor(threads, refseq_path, output_file, genbank_postfix, inc
 
     f.close()
 
-    print(f'extracted {sequences} cds sequences from into {output_file}')
-
     stop_time = datetime.now()
     total_time = stop_time - start_time
     print(f'run time was: {total_time}')
