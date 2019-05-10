@@ -4,7 +4,7 @@ model: {
     path: /work/dacb/detect_hgt/deeperdeepsea.py,
     class: DeeperDeepSEA,
     class_args: {
-        sequence_length: 1000,
+        sequence_length: 750,
         n_targets: 1,
     },
     #non_strand_specific: mean
@@ -36,7 +36,8 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
         sequence_alphabet_axis: 1,
         targets_batch_axis: 0,
         shuffle: False
-    }
+    },
+    features: notEnterobacteriaceae
 }
 train_model: !obj:selene_sdk.TrainModel {
     batch_size: 64,
