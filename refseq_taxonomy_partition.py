@@ -3,8 +3,19 @@
 import argparse
 import sys
 
+import click
 import pandas as pd
 
+
+@click.command
+@click.option('-l', '--tax_level', 'tax_level', type=str, required=True,
+        help='what taxonomy level should the data be partitioned on')
+@click.option('-t', '--taxa', 'taxa', type=str, required=True,
+        help='the taxonomy class that will be partition out')
+@click.option('-m', '--output_file_matched', 'output_file_matched',
+        type=str, required=True,
+        help='name of the output file containing matched
+                help='name of the output file containing taxonomy annotations')
 
 parser = argparse.ArgumentParser(description='refseq taxonomy partition',
             usage='e.g., ./refseq_taxonomy_partition.py family Enterobacteriaceae')
