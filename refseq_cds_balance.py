@@ -1,45 +1,46 @@
 #!/usr/bin/env python
 
-import argparse
-import sys
-
+import click
 import numpy as np
 import pandas as pd
-import scipy.io
 
-parser = argparse.ArgumentParser(description='balance sample refseq cds for both classes',
-            usage='e.g., ./refseq_cds_balance.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_matched_filtered.tsv refseq_cds_not_matched_filtered.tsv')
-parser.add_argument('taxlevel', 
-        choices=['kingdom', 'phylum', 'class', 'order', 'family', 'genus'],
-        help='what taxonomy level should be used as the class')
-parser.add_argument('taxa', 
-        help='the taxonomy class that will be class 0')
-parser.add_argument('outfile',
-        help='output file containing the balanced samples')
-parser.add_argument('filenames', nargs='*',
-        help='the refseq cds tsv files to be concatenated and sample classes balanced')
-args = parser.parse_args()
-taxlevel = args.taxlevel
-taxa = args.taxa
-outfile = args.outfile
-filenames = args.filenames
 
-print(f"reading tsv data file {filenames[0]}")
-df = pd.read_csv(filenames.pop(0), sep='\t').filter(items=['sequence', taxlevel])
-for filename in filenames:
-    print(f"reading tsv data file {filename}")
-    df = df.append(pd.read_csv(filename, sep='\t').filter(items=['sequence', taxlevel]))
+@click.command()
+@click.option('-l', '--tax_level', 'tax_level', type=str, required=True,
+        help='what taxonomy level should the data be partitioned on')
+@click.option('-t', '--taxa', 'taxa', type=str, required=True,
+        help='the taxonomy class that will be balanced for sampling')
+@click.option('-o', '--output_file', 'output_file', type=str, required=True,
+        help='name of the output file containing balanced samples')
+@click.option('-i', '--input_file', 'input_file', type=str, required=True,
+        help='the location of the taxonomy annotated sequences')
+@click.option('-r', '--random_seed', 'random_seed', type=int, default=42,
+        show_default=True,
+        help='random seed to be used for shuffling and sampling data partitions')
+def refseq_cds_balance(tax_level, taxa, input_file, output_file, random_seed):
+    """Balance samples of sequences for a binary classification at a given taxonomy level and class"""
 
-print(f"finding positive examples")
-positives = df.loc[df[taxlevel] == taxa]
-print(f"{positives.shape[0]} samples")
-print(f"finding negative examples")
-negatives = df.loc[df[taxlevel] != taxa]
-print(f"{negatives.shape[0]} samples with be randomly sampled down")
-negsamples = negatives.sample(n=positives.shape[0], random_state=42)
-print(f"concatenating positive and negative samples")
-df = positives.append(negsamples)
-print(f"shuffling the order of samples")
-df = df.sample(frac=1).reset_index(drop=True)
-print(f"saving balanced samples to {outfile}")
-df.to_csv(outfile, sep='\t', index=False)
+    print(f'reading cds tsv data file {input_file}')
+    df = pd.read_csv(input_file, sep='\t').filter(items=['sequence', tax_level])
+    print(f'there were {df.shape[0]} sequences in {input_file}')
+
+    print(f'finding sequences at the {tax_level} matching {taxa}')
+    positives = df.loc[df[tax_level] == taxa]
+    print(f'found {positives.shape[0]} samples')
+    print(f'finding sequences not matching {tax_level} if {taxa}')
+    negatives = df.loc[df[tax_level] != taxa]
+    print(f'found {negatives.shape[0]} samples to be randomly sampled down to {positives.shape[0]} samples')
+    negatives = negatives.sample(n=positives.shape[0], random_state=random_seed)
+    print(f'concatenating positive and negative samples')
+    df = positives.append(negatives)
+    # attempt to allow garbage collection before shuffling
+    positives = None
+    negatives = None
+    print(f'shuffling the order of samples')
+    df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
+    print(f'saving {df.shape[0]} balanced samples to {output_file}')
+    df.to_csv(output_file, sep='\t', index=False)
+
+
+if __name__ == '__main__':
+    refseq_cds_balance()
