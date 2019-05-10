@@ -1,10 +1,12 @@
 #!/bin/bash
 
+REFSEQ_PATH=/work/data/refseq
 THREADS=24
 MIN_SEQ_LEN=750
 
 if [ ! -e refseq_taxonomy.tsv ]; then
-	./refseq_taxonomy_extractor.py
+	./refseq_taxonomy_extractor.py --refseq_path $REFSEQ_PATH \
+			--output_file refseq_taxonomy.tsv --threads $THREADS
 fi
 
 if [ ! -e refseq_taxonomy_matched.tsv -o ! -e refseq_taxonomy_not_matched.tsv ]; then
