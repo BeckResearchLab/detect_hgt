@@ -54,26 +54,32 @@ else:
 
 print("creating final data frame")
 df['target'] = np.array(df[taxlevel] == taxa, dtype=int)
+df.drop(taxlevel, axis=1, inplace=True)
 
 print("splitting in training, validation, and test sets")
 max_train = int(train_frac * df.shape[0])
 df_train = df.iloc[range(max_train)]
+print(f"training set is {df_train.shape[0]} samples")
 valid_i = int(valid_frac * df.shape[0])
 df_valid = df.iloc[range(max_train, max_train+valid_i)]
+print(f"validation set is {df_valid.shape[0]} samples")
 df_test = df.iloc[range(max_train+valid_i, df.shape[0])]
+print(f"test set is {df_test.shape[0]} samples")
 assert df.shape[0] == df_train.shape[0] + df_valid.shape[0] + df_test.shape[0]
+
+print(df_train.shape)
 
 outfile = 'refseq_cds_train.mat'
 print(f"saving training data to {outfile} ({train_frac * 100.}%)")
 scipy.io.savemat(outfile, { 'sequence' : df_train['sequence'],
-        'target' : df_train['target']}, appendmat=True)
+        'target' : df_train['target']})
 
 outfile = 'refseq_cds_valid.mat'
 print(f"saving validation data to {outfile} ({valid_frac * 100.}%)")
 scipy.io.savemat(outfile, { 'sequence' : df_valid['sequence'],
-        'target' : df_valid['target']}, appendmat=True)
+        'target' : df_valid['target']})
 
 outfile = 'refseq_cds_test.mat'
 print(f"saving testing data to {outfile} ({test_frac * 100.}%)")
 scipy.io.savemat(outfile, { 'sequence' : df_test['sequence'],
-        'target' : df_test['target']}, appendmat=True)
+        'target' : df_test['target']})
