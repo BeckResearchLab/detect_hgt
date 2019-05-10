@@ -9,6 +9,15 @@ import pandas as pd
 import selene_sdk.sequences
 import scipy.io
 
+
+def df_named_subset_savemat(title, outfile, frac, df):
+    print(f"saving {title} data to {outfile} ({frac * 100.}% = {df.shape[0]})")
+    sequences = np.array(df['sequence'].values.tolist())
+    targets = np.array(df['target'].values.tolist())
+    scipy.io.savemat(outfile, { 'sequence' : sequences,
+        'target' : targets})
+
+
 parser = argparse.ArgumentParser(description='convert refseq cds tsv to .mat file',
             usage='e.g., ./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_balanced.mat')
 parser.add_argument('taxlevel', 
@@ -67,19 +76,6 @@ df_test = df.iloc[range(max_train+valid_i, df.shape[0])]
 print(f"test set is {df_test.shape[0]} samples")
 assert df.shape[0] == df_train.shape[0] + df_valid.shape[0] + df_test.shape[0]
 
-print(df_train.shape)
-
-outfile = 'refseq_cds_train.mat'
-print(f"saving training data to {outfile} ({train_frac * 100.}%)")
-scipy.io.savemat(outfile, { 'sequence' : df_train['sequence'],
-        'target' : df_train['target']})
-
-outfile = 'refseq_cds_valid.mat'
-print(f"saving validation data to {outfile} ({valid_frac * 100.}%)")
-scipy.io.savemat(outfile, { 'sequence' : df_valid['sequence'],
-        'target' : df_valid['target']})
-
-outfile = 'refseq_cds_test.mat'
-print(f"saving testing data to {outfile} ({test_frac * 100.}%)")
-scipy.io.savemat(outfile, { 'sequence' : df_test['sequence'],
-        'target' : df_test['target']})
+df_named_subset_savemat('training', 'refseq_cds_train.mat', train_frac, df_train)
+df_named_subset_savemat('validation', 'refseq_cds_valid.mat', valid_frac, df_valid)
+df_named_subset_savemat('test', 'refseq_cds_test.mat', test_frac, df_test)
