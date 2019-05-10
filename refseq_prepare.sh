@@ -30,5 +30,5 @@ if [ ! -e refseq_cds_balanced.tsv ]; then
 fi
 
 if [ ! -e refseq_cds_balanced.mat ]; then
-	./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_balanced.mat
+	./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_balanced.mat --trim $MIN_SEQ_LEN
 fi
