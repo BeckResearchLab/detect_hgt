@@ -13,8 +13,9 @@ fi
 if [ ! -e refseq_cds_filtered.tsv ]; then
 	./refseq_cds_filter.py --input_file refseq_cds.tsv --output_file refseq_cds_filtered.tsv \
 			--min_seq_length $MIN_SEQ_LEN --trim_seq_length $MIN_SEQ_LEN
+fi
 
-ef [ ! -e refseq_cds_filtered_balanced.tsv ]; then
+if [ ! -e refseq_cds_filtered_balanced.tsv ]; then
 	./refseq_cds_balance.py --tax_level family --taxa Enterobacteriaceae \
 			--output_file refseq_cds_filtered_balanced.tsv \
 			--input_file refseq_cds_filtered.tsv \
