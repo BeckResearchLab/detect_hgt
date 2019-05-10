@@ -20,5 +20,8 @@ if [ ! -e refseq_cds_filtered_balanced.tsv ]; then
 fi
 
 if [ ! -e refseq_cds_train.mat -o ! -e refseq_cds_valid.mat -o ! -e refseq_cds_test.mat ]; then
-	./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv --trim $MIN_SEQ_LEN
+	./refseq_cds_savemat.py --input_file refseq_cds_filtered_balanced.tsv \
+			--train_frac 0.7 --valid_frac 0.2 --test_frac 0.1 \
+			--train_file refseq_cds_train.mat --valid_file refseq_cds_valid.mat \
+			--test_file refseq_cds_test.mat
 fi
