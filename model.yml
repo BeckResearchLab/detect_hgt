@@ -45,9 +45,10 @@ train_model: !obj:selene_sdk.TrainModel {
     report_stats_every_n_steps: 100,
     #n_validation_samples: 32000,
     #n_test_samples: 120000,
-    cpu_n_threads: 24,
+    cpu_n_threads: 48,
     use_cuda: False,
-    data_parallel: True
+    data_parallel: True,
+    logging_verbosity: 2
 }
 random_seed: 42
 output_dir: ./training_outputs
