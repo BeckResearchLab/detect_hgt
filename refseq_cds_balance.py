@@ -6,7 +6,9 @@ import pandas as pd
 
 
 @click.command()
-@click.option('-l', '--tax_level', 'tax_level', type=str, required=True,
+@click.option('-l', '--tax_level', 'tax_level', required=True,
+        type=click.Choice(['kingdom', 'phylum', 'class', 'order',
+                            'family', 'genus']),
         help='what taxonomy level should the data be partitioned on')
 @click.option('-t', '--taxa', 'taxa', type=str, required=True,
         help='the taxonomy class that will be balanced for sampling')
