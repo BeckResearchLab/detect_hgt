@@ -57,10 +57,10 @@ df['target'] = np.array(df[taxlevel] == taxa, dtype=int)
 
 print("splitting in training, validation, and test sets")
 max_train = int(train_frac * df.shape[0])
-df_train = df.iloc(range(max_train))
+df_train = df.iloc[range(max_train)]
 valid_i = int(valid_frac * df.shape[0])
-df_valid = df.iloc(range(max_train, max_train+valid_i))
-df_test = df.iloc(range(max_train+valid_i, df.shape[0]))
+df_valid = df.iloc[range(max_train, max_train+valid_i)]
+df_test = df.iloc[range(max_train+valid_i, df.shape[0])]
 assert df.shape[0] == df_train.shape[0] + df_valid.shape[0] + df_test.shape[0]
 
 outfile = 'refseq_cds_train.mat'
