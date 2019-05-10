@@ -5,10 +5,11 @@ import sys
 
 import numpy as np
 import pandas as pd
+import selene_sdk.sequences
 import scipy.io
 
 parser = argparse.ArgumentParser(description='convert refseq cds tsv to .mat file',
-            usage='e.g., ./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.mat refseq_cds_balanced.tsv')
+            usage='e.g., ./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_balanced.mat')
 parser.add_argument('taxlevel', 
         choices=['kingdom', 'phylum', 'class', 'order', 'family', 'genus'],
         help='what taxonomy level should be used as the class')
@@ -34,6 +35,12 @@ if trim_length is not None:
     raise Exception("unimplemented feature (--trim)")
 else:
     pass
+
+print(f"encoding {df.shape[0]} sequences")
+bases_arr = np.array(['A', 'C', 'G', 'T'])
+bases_encoding = { 'A': 0, 'C': 1, 'G': 2, 'T': 3 }
+df["sequence"] = df['sequence'].apply(lambda x:
+        selene_sdk.sequences.sequence_to_encoding(x, bases_encoding, bases_arr))
 
 outfile = 'refseq_cds.mat'
 print(f"saving mat data to file {outfile}")
