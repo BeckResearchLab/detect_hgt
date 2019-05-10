@@ -15,8 +15,8 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
         sequence_key: sequence,
         targets_key: target,
         sequence_batch_axis: 0,
-        sequence_alphabet_axis: 1,
-        targets_batch_axis: 0,
+        sequence_alphabet_axis: 2,
+        targets_batch_axis: 1,
         shuffle: False
     },
     validate_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
@@ -24,8 +24,8 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
         sequence_key: sequence,
         targets_key: target,
         sequence_batch_axis: 0,
-        sequence_alphabet_axis: 1,
-        targets_batch_axis: 0,
+        sequence_alphabet_axis: 2,
+        targets_batch_axis: 1,
         shuffle: False
     },
     test_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
@@ -33,8 +33,8 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
         sequence_key: sequence,
         targets_key: target,
         sequence_batch_axis: 0,
-        sequence_alphabet_axis: 1,
-        targets_batch_axis: 0,
+        sequence_alphabet_axis: 2,
+        targets_batch_axis: 1,
         shuffle: False
     },
     features: notEnterobacteriaceae
