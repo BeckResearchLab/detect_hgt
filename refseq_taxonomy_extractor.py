@@ -31,6 +31,9 @@ for root, dirs, files in os.walk(homedir):
                 print("{:.2%} complete ({} of {} files)".format(current_file/file_count, current_file, file_count))
             try:
                 for seq_record in SeqIO.parse(filepath, "genbank"):
+                    if "plasmid" in seq_record.description
+                            or "extrachromosomal" in record.description:
+                        continue
                     taxonomy = seq_record.annotations["taxonomy"]
                     f.write(f"{filepath}\t{taxonomy[0] if len(taxonomy) > 0 else np.nan}\t{taxonomy[1] if len(taxonomy) > 1 else np.nan}\t{taxonomy[2] if len(taxonomy) > 2 else np.nan}\t{taxonomy[3] if len(taxonomy) > 3 else np.nan}\t{taxonomy[4] if len(taxonomy) > 4 else np.nan}\t{taxonomy[5] if len(taxonomy) > 5 else np.nan}\n")
                     break
