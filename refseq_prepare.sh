@@ -29,6 +29,6 @@ if [ ! -e refseq_cds_balanced.tsv ]; then
 	./refseq_cds_balance.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_matched_filtered.tsv refseq_cds_not_matched_filtered.tsv
 fi
 
-if [ ! -e refseq_cds_balanced.mat ]; then
-	./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_balanced.mat --trim $MIN_SEQ_LEN
+if [ ! -e refseq_cds_train.mat -o ! -e refseq_cds_valid.mat -o ! -e refseq_cds_test.mat ]; then
+	./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv --trim $MIN_SEQ_LEN
 fi
