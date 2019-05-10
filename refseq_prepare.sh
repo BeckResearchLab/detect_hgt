@@ -13,8 +13,10 @@ if [ ! -e refseq_cds_filtered.tsv ]; then
 	./refseq_cds_filter.py --input_file refseq_cds.tsv --output_file refseq_cds_filtered.tsv \
 			--min_seq_length $MIN_SEQ_LEN --trim_seq_length $MIN_SEQ_LEN
 
-if [ ! -e refseq_cds_balanced.tsv ]; then
-	./refseq_cds_balance.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_matched_filtered.tsv refseq_cds_not_matched_filtered.tsv
+if [ ! -e refseq_cds_filtered_balanced.tsv ]; then
+	./refseq_cds_balance.py --tax_level family --taxa Enterobacteriaceae \
+			--output_file refseq_cds_filtered_balanced.tsv \
+			--input_file refseq_cds_filtered.tsv --random_seed 42
 fi
 
 if [ ! -e refseq_cds_train.mat -o ! -e refseq_cds_valid.mat -o ! -e refseq_cds_test.mat ]; then
