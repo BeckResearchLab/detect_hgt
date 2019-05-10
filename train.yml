@@ -1,0 +1,36 @@
+---
+ops: [train, evaluate]
+model: {
+    path: /work/dacb/detec_hgt/deeperdeepsea.py,
+    class: DeeperDeepSEA,
+    class_args: {
+        sequence_length: 1000,
+        n_targets: 1,
+    }#,
+    #non_strand_specific: mean
+}
+sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+    filepath: /work/dacb/detect_hgt/test.mat,
+    sequence_key: sequence,
+    targets_key: target,
+    random_seed: 42,
+    shuffle: True,
+    sequence_batch_axis: 0,
+    sequence_alphabet_axis: 1,
+    targets_batch_axis: 0
+}
+train_model: !obj:selene_sdk.TrainModel {
+    batch_size: 64,
+    max_steps: 8000,  # update this value for longer training
+    report_stats_every_n_steps: 100,
+    n_validation_samples: 32000,
+    n_test_samples: 120000,
+    cpu_n_threads: 24,
+    use_cuda: False
+    #data_parallel: False
+}
+random_seed: 42
+output_dir: ./training_outputs
+create_subdirectory: False
+load_test_set: False
+...
