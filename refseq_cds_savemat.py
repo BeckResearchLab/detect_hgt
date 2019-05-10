@@ -10,15 +10,15 @@ import selene_sdk.sequences
 import scipy.io
 
 
-def df_named_subset_savemat(title, outfile, frac, df):
-    print(f"saving {title} data to {outfile} ({frac * 100.}% = {df.shape[0]})")
-    sequences = np.array(df['sequence'].values.tolist())
-    targets = np.array(df['target'].values.tolist())
+def df_named_subset_savemat(title, outfile, frac, df, start, end):
+    print(f"saving {title} data to {outfile} ({frac * 100.}% = {len(range(start, end))} samples)")
+    sequences = np.array(df.iloc[range(start, end)]['sequence'].values.tolist())
+    targets = np.array(df.iloc[range(start, end)]['target'].values.tolist())
     scipy.io.savemat(outfile, { 'sequence' : sequences,
         'target' : targets})
 
 
-parser = argparse.ArgumentParser(description='convert refseq cds tsv to .mat file',
+parser = argparse.ArgumentParser(description='convert refseq cds tsv to .mat file in hdf5 format',
             usage='e.g., ./refseq_cds_savemat.py family Enterobacteriaceae refseq_cds_balanced.tsv refseq_cds_balanced.mat')
 parser.add_argument('taxlevel', 
         choices=['kingdom', 'phylum', 'class', 'order', 'family', 'genus'],
@@ -66,16 +66,9 @@ df['target'] = np.array(df[taxlevel] == taxa, dtype=int)
 df.drop(taxlevel, axis=1, inplace=True)
 
 print("splitting in training, validation, and test sets")
-max_train = int(train_frac * df.shape[0])
-df_train = df.iloc[range(max_train)]
-print(f"training set is {df_train.shape[0]} samples")
-valid_i = int(valid_frac * df.shape[0])
-df_valid = df.iloc[range(max_train, max_train+valid_i)]
-print(f"validation set is {df_valid.shape[0]} samples")
-df_test = df.iloc[range(max_train+valid_i, df.shape[0])]
-print(f"test set is {df_test.shape[0]} samples")
-assert df.shape[0] == df_train.shape[0] + df_valid.shape[0] + df_test.shape[0]
 
-df_named_subset_savemat('training', 'refseq_cds_train.mat', train_frac, df_train)
-df_named_subset_savemat('validation', 'refseq_cds_valid.mat', valid_frac, df_valid)
-df_named_subset_savemat('test', 'refseq_cds_test.mat', test_frac, df_test)
+max_train = int(train_frac * df.shape[0])
+df_named_subset_savemat('training', 'refseq_cds_train.mat', train_frac, df, 0, max_train)
+valid_i = int(valid_frac * df.shape[0])
+df_named_subset_savemat('validation', 'refseq_cds_valid.mat', valid_frac, df, max_train, max_train+valid_i)
+df_named_subset_savemat('test', 'refseq_cds_test.mat', test_frac, df, max_train+valid_i, df.shape[0])
