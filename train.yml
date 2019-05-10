@@ -1,7 +1,7 @@
 ---
 ops: [train, evaluate]
 model: {
-    path: /work/dacb/detec_hgt/deeperdeepsea.py,
+    path: /work/dacb/detect_hgt/deeperdeepsea.py,
     class: DeeperDeepSEA,
     class_args: {
         sequence_length: 1000,
@@ -10,7 +10,7 @@ model: {
     #non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
-    filepath: /work/dacb/detect_hgt/test.mat,
+    filepath: /work/dacb/detect_hgt/refseq_cds.mat,
     sequence_key: sequence,
     targets_key: target,
     random_seed: 42,
@@ -33,4 +33,4 @@ random_seed: 42
 output_dir: ./training_outputs
 create_subdirectory: False
 load_test_set: False
-...
+#...
