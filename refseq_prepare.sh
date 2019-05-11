@@ -24,6 +24,7 @@ fi
 
 if [ ! -e refseq_cds_train.mat -o ! -e refseq_cds_valid.mat -o ! -e refseq_cds_test.mat ]; then
 	./refseq_cds_savemat.py --input_file refseq_cds_filtered_balanced.tsv \
+			--tax_level family --taxa Enterobacteriaceae \
 			--train_frac 0.7 --valid_frac 0.2 --test_frac 0.1 \
 			--train_file refseq_cds_train.mat --valid_file refseq_cds_valid.mat \
 			--test_file refseq_cds_test.mat
