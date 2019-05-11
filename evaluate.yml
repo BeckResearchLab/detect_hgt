@@ -20,10 +20,9 @@ sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
 }
 evaluate_model: !obj:selene_sdk.EvaluateModel {
     trained_model_path: /work/dacb/detect_hgt/training_outputs/best_model.pth.tar,
-    features: notEnterobacteriaceae,
-    #features: !obj:selene_sdk.utils.load_features_list {
-    #    input_path: /path/to/features_list.txt
-    #},
+    features: !obj:selene_sdk.utils.load_features_list {
+                input_path: /work/dacb/detect_hgt/features.txt
+    },
     batch_size: 64,
     report_gt_feature_n_positives: 10,
     use_cuda: False

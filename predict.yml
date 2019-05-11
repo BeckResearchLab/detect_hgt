@@ -1,5 +1,5 @@
 ---
-ops: [predict]
+ops: [analyze]
 model: {
     path: /work/dacb/detect_hgt/deeperdeepsea.py,
     class: DeeperDeepSEA,
@@ -12,14 +12,14 @@ model: {
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     trained_model_path: /work/dacb/detect_hgt/training_outputs/best_model.pth.tar,
     sequence_length: 750,
-    #features: !obj:selene_sdk.utils.load_features_list {
-    #    input_path: /work/dacb/detect_hgt/distinct_features.txt
-    #},
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: /work/dacb/detect_hgt/features.txt
+    },
     batch_size: 64,
     use_cuda: False,
     write_mem_limit: 150000
 }
-rediction: {
+prediction: {
     input_path: /work/dacb/detect_hgt/predict_sequences/seqs.fa,
     output_dir: /work/dacb/detect_hgt/predict_sequences,
     output_format: tsv
