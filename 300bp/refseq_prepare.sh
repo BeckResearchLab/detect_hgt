@@ -2,7 +2,7 @@
 
 REFSEQ_PATH=/work/data/refseq
 THREADS=24
-MIN_SEQ_LEN=100
+MIN_SEQ_LEN=300
 CLASS_SAMPLES=200000
 
 if [ ! -e ../refseq_cds.tsv ]; then
