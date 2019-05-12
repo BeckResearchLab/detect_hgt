@@ -10,7 +10,7 @@ model: {
     #non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
-    filepath: /work/dacb/detect_hgt/refseq_cds_test.mat,
+    filepath: /work/dacb/detect_hgt/750bp/refseq_cds_test.mat,
     sequence_key: sequence,
     targets_key: target,
     sequence_batch_axis: 0,
@@ -19,7 +19,7 @@ sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
     shuffle: False
 }
 evaluate_model: !obj:selene_sdk.EvaluateModel {
-    trained_model_path: /work/dacb/detect_hgt/training_outputs/best_model.pth.tar,
+    trained_model_path: /work/dacb/detect_hgt/750bp/training_outputs/best_model.pth.tar,
     features: !obj:selene_sdk.utils.load_features_list {
                 input_path: /work/dacb/detect_hgt/features.txt
     },
