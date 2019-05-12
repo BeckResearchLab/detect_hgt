@@ -66,7 +66,6 @@ class DeeperDeepSEA(nn.Module):
                     (sequence_length - reduce_by) / pool_kernel_size)
                  - reduce_by) / pool_kernel_size)
             - reduce_by)
-        print(self._n_channels, n_targets)
         self.classifier = nn.Sequential(
             nn.Linear(560 * self._n_channels, n_targets),
             nn.ReLU(inplace=True),
