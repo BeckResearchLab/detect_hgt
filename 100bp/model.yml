@@ -37,7 +37,9 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
         targets_batch_axis: 1,
         shuffle: False
     },
-    features: notEnterobacteriaceae
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: /work/dacb/detect_hgt/features.txt
+    }
 }
 train_model: !obj:selene_sdk.TrainModel {
     batch_size: 64,
